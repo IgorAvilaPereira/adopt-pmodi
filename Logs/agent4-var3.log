@@ -1,0 +1,19 @@
+# <time> <cycles> <totalmsg> <LB> <UB> <THRESHOLD> <iWantToTerminate>
+47 0 1 0 0 0 false
+50 0 2 40 40 40 false
+54 0 3 50 50 50 false
+75 0 4 30 30 30 false
+76 0 5 30 30 30 false
+88 0 6 40 40 40 false
+89 0 7 50 50 50 false
+90 0 8 50 50 50 false
+91 0 9 50 50 50 false
+94 0 10 50 50 50 false
+94 0 11 30 30 30 false
+102 0 12 30 30 30 false
+143 0 13 40 40 40 false
+174 0 14 50 50 50 false
+196 0 15 30 30 30 false
+224 0 16 30 30 30 false
+235 0 17 30 30 30 false
+257 0 18 30 30 30 false

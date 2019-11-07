@@ -1,0 +1,20 @@
+# <time> <cycles> <totalmsg> <LB> <UB> <THRESHOLD> <iWantToTerminate>
+38 0 1 0 10000 0 false
+43 0 2 0 10000 0 false
+43 0 3 0 10000 0 false
+51 0 4 0 0 0 false
+51 0 5 0 0 0 false
+58 0 6 0 0 0 false
+58 0 7 0 0 0 false
+65 0 8 0 0 0 false
+66 0 9 0 0 0 false
+73 0 10 0 0 0 false
+73 0 11 0 0 0 false
+78 0 12 0 0 0 false
+78 0 13 0 0 0 false
+82 0 14 0 0 0 false
+82 0 15 0 0 0 false
+85 0 16 0 0 0 false
+85 0 17 0 0 0 false
+88 0 18 0 0 0 false
+88 0 19 0 0 0 false

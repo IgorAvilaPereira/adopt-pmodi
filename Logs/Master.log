@@ -1,0 +1,27 @@
+29 0 -1
+1031 100 100
+2032 100 100
+3033 100 100
+4034 100 100
+5034 100 100
+6032 100 100
+
+
+
+Solution
+--------------------
+agent1-var0 =  0
+agent2-var1 =  0
+agent3-var2 =  1
+agent4-var3 =  1
+               quality: 100
+               broken constraints: (agent1-var0, agent2-var1)(agent3-var2, agent4-var3)
+
+Priority Order
+--------------------
+((agent1-var0, 3), ((agent2-var1, 2), ((agent3-var2, 1), ((agent4-var3, 0)))))
+depth = 4
+agent1-var0 3
+agent2-var1 2
+agent3-var2 1
+agent4-var3 0

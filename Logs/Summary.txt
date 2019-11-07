@@ -1,0 +1,6 @@
+Algorithm Adopt
+Problem MaxCSP (Tree, depth = 4)
+TotalTime2 0.233
+TotalMsg2 159
+FinalSolQlty 100
+BestSolQlty 100
