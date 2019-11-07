@@ -1,0 +1,225 @@
+
+
+Q: Jay, I have no idea where to begin running your program/fiddling
+around in it. Could you tell me? And is this a simulator or an actual
+adopt implementation that solves DCOP..because Im not sure about this
+but Dr. Bhaskar's project seemed to be on a software that simulated
+the algorithm's execution.
+
+A: The code is both a simulator and the adopt implementation. You
+should be able to execute it using the "startAdopt" script in the
+"solver" subdirectory. 
+
+# usage: startAdopt <algorithm> <problem-type> <input-file>
+E.g,
+% ./startAdopt adopt maxcsp-tree MaxCSP.txt
+
+---------------------------------------------------------------
+
+Q: Jay, is the problem data that you used for testing your algorithm
+included in the files that you sent the link to, if so, then where?
+
+A: The problem data is now available on the webpage. The filenames
+look like this template:
+
+Problem-<prob-name>-<number-of-variables>_<domain-size>_<link-density>_0.4_r<instance-number>
+
+e.g.,
+
+Problem-GraphColor-18_3_3_0.4_r24 
+
+indicates a Graph Coloring problem with 18 nodes, 3 colors, link
+density 3, and example number 24. 
+
+---------------------------------------------------------------
+
+Q: What is the problem input file format? 
+
+A: A problem input file has a list of agents, a list of variables, and
+a list of constraints, where each constraint lists the pairs of
+unallowed values, or nogoods. 
+
+AGENT <agent id>
+...
+VARIABLE <variable id> <agent id> <domain size> 
+...
+CONSTRAINT <variable id> <variable id> <weight> 
+NOGOOD <value> <value> 
+....
+
+Each <value> must be an integer in [0, <domain size> - 1] for the
+corresponding variable.  
+
+The <weight> field of a constraint specifies the cost of breaking the
+constraint. It is optional and defaults to 1.
+
+Here is a sample file for a graph coloring problem with 3 agents, 3
+variables each assigned to an agent, and two "not equal" constraints. 
+
+AGENT 1
+AGENT 2
+AGENT 3
+VARIABLE 0 1 3
+VARIABLE 1 2 3
+VARIABLE 2 3 3
+CONSTRAINT 0 2
+NOGOOD 0 0
+NOGOOD 1 1
+NOGOOD 2 2
+CONSTRAINT 1 2
+NOGOOD 0 0
+NOGOOD 1 1
+NOGOOD 2 2
+
+---------------------------------------------------------------
+
+Q: How is the DFS tree formed from the input file? 
+
+A: The DFS tree is formed in a preprocessing step. Various heuristics
+can be used. In this implementation, I use something that is similar to
+the Brelaz heuristic. The relevant code can be found in Problem.java
+(see method priorityTree()).
+
+---------------------------------------------------------------
+
+Q: How is the code structured?
+
+A: 
+
+* Simulator.java is the top-level class. It has a variety of jobs
+including: 
+
+  - coordinating sending messages between different agent
+threads. Thus, it implements the MessageSender interface. 
+  - spawning each agent in a separate thread. The AgentThread objects are
+stored in the member variable 'Vector agents'.
+  - logging various data
+  - detecting when all threads (agents) have terminated, and then terminating the
+entire program
+
+* AgentThread.java is a thread representing a single agent. It
+contains a member variable 'Algorithm algorithm', which is the
+algorithm that will be executed by this thread (agent). 
+
+* Algorithm.java: An abstract class representing an algorithm. Since
+an algorithm typically sends and receives messages, this class
+also implements the MessageSender interface. 
+
+* Intradopt.java: Extends the abstract Algorithm class. Multiple
+variables assigned to this agent are handled by creating a pseudoagent
+for each variable within this agent. Intradopt coordinates message
+passing between pseudoagents within an agent. Messages sent between
+pseudoagents within different agents are passed up to Simulator and
+handled there.
+
+* Adopt.java: Implements the Adopt algorithm assuming a single variable. 
+
+This graphic might be useful:
+http://www-2.cs.cmu.edu/~pmodi/adopt/arch.jpg
+
+---------------------------------------------------------------
+
+Q: I cannot run your startAdopt script since there is a java command
+in there that has a classpath that is pointed to
+/home/modi/teamcore/code/Adopt. I assume this classpath has an
+association with $1, $2, and $3. (By the way, are these like
+environment variables?)
+
+A: Your classpath should point to the directory where you un-tar'ed the
+code. Modify the startAdopt script accordingly.
+
+$1, $2, $3 are the three arguments to the startAdopt script and are
+independent of the classpath. They represent <algorithm>
+<problem-type> <input-file> .  
+
+---------------------------------------------------------------
+
+
+Q: Where would we specify the bounded error in the code?  We are trying
+to test the algorithm in different configurations.
+
+A: You can specify the error bound "b" on the command line in the
+following way:
+
+% ./startAdopt adopt-bound2 maxcsp-tree MaxCSP.txt
+
+This specifies an error bound of b=2. This means that Adopt is allowed
+to break 2 constraints above and beyond the minimum number of
+constraints it would break in the optimal solution (e.g., with b=0). 
+
+---------------------------------------------------------------
+
+Q: There are three agents, each with one variable.  Every time I run
+ADOPT on the file, I get a different number of cycles for each agent,
+as well as a different number of "total messages sent."  Is
+this the desired behavior? 
+
+A: Yes, you will see variations in the number of messages and other
+statistics since the agents execute asynchronously, which introduces
+some randomness.  In my implementation, agents run asynchronously in
+separate threads.  But if all variables are assigned to the same
+agent, then it should be completely deterministic because then the
+"virtual" agents will execute synchronously. 
+
+---------------------------------------------------------------
+
+Q: What exactly is a cycle, as output by the program?  I thought a
+cycle was one instance of an agent receiving messages, updating its
+value, and broadcasting messages.  But, looking at Intradopt, the
+variable cycleCnt is updated even for "empty" cycles, when the agent
+is receiving null messages.
+
+
+A: A cycle is defined as *all* agents receiving their messages and
+sending their messages, in parallel. Thus, even if one particular
+agent does not receive any messages, the cycle count still increases
+as long as some agent receives a message. Measuring cycles is not
+possible when agents execute asynchronously. 
+
+---------------------------------------------------------------
+
+Q: Do all variables have to be within one agent for synchronous cycles
+to be a meaningful measure?
+
+A: Yes. Measuring synchronous cycles is not meaningful when agents are
+executing asynchronously.  Suitable performance metrics for
+asynchronously executing agents is an open research topic. To measure
+synchronous cycles, you must assign all variables to a single agent. 
+
+---------------------------------------------------------------
+
+Q: So how does one measure synchronous cycles in your implementation?
+
+A: 
+
+*Assign all variables to a single agent and run the algorithm
+*The virtual agents will run synchronously within the single agent.
+*The number of cycles will be written to a log file in Logs/<agent-name>.log
+
+---------------------------------------------------------------
+
+
+Q: Adopt didn't always produce the optimal solution.  Sometimes it
+produced a suboptimal solution (on maybe 1 out of every 7 or 8 runs).  
+
+A: Adopt (with error bound = 0) is guaranteed to return the optimal
+solution so this should not happen. In my experience with this
+implementation, if I ever noticed a suboptimal solution printed out, I
+usually found that it was due to some error in printing the final
+variable values of all the agents, e.g., some agent terminated without
+reporting its final value. Make sure that this is not the case.
+
+---------------------------------------------------------------
+
+
+Q: To run multiple variables within a single agent then, i.e., multiple
+variables per agent, what do you do?
+
+A: The problem input file should specify that all variables belong to
+one agent. The following example shows three variables (named 0,1,2) all
+assigned to agent 1. Each variable has a domain of size 3. 
+
+AGENT 1
+VARIABLE 0 1 3
+VARIABLE 1 1 3
+VARIABLE 2 1 3
